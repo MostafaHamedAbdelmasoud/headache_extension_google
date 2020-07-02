@@ -2,45 +2,100 @@
 
 
 
-// console.log('you should feel good always');
-
-
-
-
 ////////////// get storage ///////////
 
 var annoying_Object = {};
 let annoying_words = "hd";
 
 chrome.storage.sync.get(['receivedName'], function (result) {
-    // console.log('receivedName is ' + result.receivedName);
     window.annoying_words = result.receivedName;
-    // console.log('annoying_words is ' + window.annoying_words);
 
     window.annoying_words = window.annoying_words.toString().split(" ");
 
     for (var i = 0; i < window.annoying_words.length; i++) {
         window.annoying_Object[window.annoying_words[i]] = 1;
     }
-    
+
 });
-// console.log(annoying_words);
 
 
 
 ////////////// end storage ///////////
 
+///////////////// rabin karb algo////////////
+
+var convertStringToIntArray = function (s) {
+    var a = [];
+    for (var i = 0; i < s.length; i++)
+        a.push(s[i].charCodeAt(0) - "0".charCodeAt(0));
+    return a;
+}
+
+// Fix sign issues with remainder operation (get "real" modulus operation)
+var mod = function (n, modulus) {
+    if (n < 0)
+        return (modulus + (n % modulus)) % modulus;
+    return n % modulus;
+};
+
+var rkSearch = function (text, pattern) {
+    textA = convertStringToIntArray(text);
+    patternA = convertStringToIntArray(pattern);
+    var n = textA.length;
+    var m = patternA.length;
+    var d = 10; // because we're just using 0-9
+    var prime = 11;
+    var h = Math.pow(d, m - 1);
+    var p = 0;
+    var t = 0;
+
+    // Pre-processing the pattern (i.e. computing its hash)
+    for (i = 0; i < m; i++) {
+        p = mod(d * p + patternA[i], prime);
+        t = mod(d * t + textA[i], prime);
+    }
+
+    var results = {
+        text: textA,
+        pattern: patternA,
+        tValues: [],
+        spuriousHits: [],
+        matches: []
+    };
+    // Searching for matches
+    for (i = 0; i < n - m; i++) {
+        if (t === p) {
+            if (text.substring(i, i + m) === pattern) {
+                results.matches.push(i);
+            } else {
+                results.spuriousHits.push(i);
+            }
+        }
+
+        t = mod(d * (t - (h * textA[i])) + textA[i + m], prime);
+        results.tValues.push(t);
+    }
+    return results;
+}
+
+var displayResults = function (results) {
+    results = results || {};
+    var output = "<ul>";
+    $.each(results, function (key, value) {
+        output += "<li>" + key + ": " + value + "</li>";
+    });
+    output += "</ul>";
+    $("div#results").show().html(output);
+}
+
+
+  
+
+/////////////// end rabin karb ///////////////////
 
 initScript();
 
 
-
-
-
-// var temp_local_storage = document.getElementById('greeting');
-// if(temp_local_storage){
-//     localStorage.setItem('receivedName',temp_local_storage.innerHTML);
-// }
 
 var oldURL = location.href
 setInterval(function () {
@@ -84,9 +139,9 @@ function initScript() {
     })();
 
     let oldPosts = [];
-    // Observe a specific DOM element:
+    
     observeDOM(document.getElementById('mainContainer'), function (e) {
-        //let allPagePosts = Array.from(document.getElementsByClassName('_4l_v'));
+     
         let allPagePosts = Array.from(document.getElementsByClassName('userContent'));
         let newPosts = returnNewElementsFromNewArray(oldPosts, allPagePosts)
         for (let post of newPosts) {
@@ -94,51 +149,36 @@ function initScript() {
         }
 
         for (let element of newPosts) {
-            //// console.log(element.textContent);
-            // console.log(element.textContent);
+            
             var english = /^[A-Za-z0-9]*$/;
             if (element.textContent) {
 
-                chrome
-                    .runtime
-                    .sendMessage({
-                        method: 'POST',
-                        action: 'xhttp',
-                        url: '',
-                        data: `text=${element.textContent}`
-                    }, (res) => {
-                        if (res != null) {
+                var post_title = element.textContent;
 
 
-                            /////////////////////////
-                            var post_title = element.textContent;
+                if (annoying_words == null || annoying_words == undefined) return;
+                
+                    for(let pattern in annoying_Object){
+                        let results = rkSearch(post_title+"  ", pattern);
+                       
 
-
-                            // // console.log(chrome.storage.sync.get(['receivedName'],callback){
-                            //      callback(result.receivedName);
-                            //     });
-
-                            if (annoying_words == null || annoying_words == undefined) return;
-                            post_title = post_title.toString().split(" ");
-
-                            // console.log("this is annoying object " + JSON.stringify(annoying_Object));
-                            for (var j = 0; j < post_title.length; j++) {
-                                if (annoying_Object.hasOwnProperty(post_title[j])) {
-                                    // console.log('this is matched ' + post_title[j])
-                                    element
-                                        .classList
-                                        .add("blur");
-                                    element
-                                        .onclick = function () {
-                                            this.classList.toggle("blur")
-                                        }
-                                }
-                            }
+                    if (results.matches[0] != undefined) {
+                        element
+                        .classList
+                        .add("blur");
+                        element
+                        .onclick = function () {
+                            this.classList.toggle("blur")
                         }
+                        console.log(element.textContent);
+
+                    }
+                } //end for loop
 
 
-                    });
-            }
+
+
+            } //end if
 
         }
 
@@ -147,6 +187,7 @@ function initScript() {
     function returnNewElementsFromNewArray(oldArr, newArr) {
         return newArr.filter(val => !oldArr.includes(val))
     }
+
 
 }
 
