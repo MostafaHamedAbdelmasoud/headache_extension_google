@@ -1,0 +1,60 @@
+
+input {
+    padding: 5px;
+    font-size: 12px;
+    width: 150px;
+    height: 20px;
+}
+
+button {
+    height: 30px;
+    width: 70px;
+    background: none;
+    /* This removes the default background */
+    color: #313131;
+    border: 1px solid #313131;
+    border-radius: 50px;
+    /* This gives our button rounded edges */
+    font-size: 12px;
+    cursor: pointer;
+}
+
+form {
+    padding-top: 20px;
+}
+
+.settings-open.settings {
+    transform: none;
+ }
+
+ .greeting-container {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+ }
+ .greeting {
+    font-family: sans-serif;
+    font-size: 16px;
+    text-align: center;
+    color: #fff;
+ }
+ body {
+    background-color: #c670ca;
+    background-image: linear-gradient(45deg, #c670ca 0%, #25a5c8 52%, #20e275 90%);
+ }
+ html {
+    height: 100%;
+ }
+
+.blur{
+    -webkit-filter: blur(5px);
+    -moz-filter: blur(5px);
+    -o-filter: blur(5px);
+    -ms-filter: blur(5px);
+    filter: blur(5px);
+}
+
+
+ /* html {
+    height: 100%;
+ } */
