@@ -1,3 +1,7 @@
+# link for this extension:
+https://chrome.google.com/webstore/detail/headache/hkabbdifibdddbgninhiepliloeegndf?hl=ar&authuser=2
+
+
 # original code for getting facebook posts is here:
 https://github.com/microsmsm/HappyZoneExtension
 
